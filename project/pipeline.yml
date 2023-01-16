@@ -49,7 +49,7 @@ jobs:
         - -c
         - |
           cd source-code
-          scp -r . adminuser@20.231.55.121:/var/www/html/
+          scp -r . adminuser@20.231.55.121 /var/www/html/
 
 resources:
 - name: source-code

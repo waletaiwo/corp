@@ -1,0 +1,59 @@
+jobs:
+- name: deploy
+  plan:
+  - get: source-code
+    trigger: true
+  - task: install-terraform
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: hashicorp/terraform}
+      inputs:
+      - name: source-code
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          wget https://releases.hashicorp.com/terraform/0.x/terraform_3.37.0_linux_amd64.zip
+          unzip terraform_3.37.0_linux_amd64.zip
+          mv terraform /usr/local/bin/
+  - task: provision-vm
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: hashicorp/terraform}
+      inputs:
+      - name: source-code
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          cd source-code/project
+          terraform init
+          terraform apply -auto-approve
+  - task: deploy-app
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source: {repository: php}
+      inputs:
+      - name: source-code
+      run:
+        path: sh
+        args:
+        - -c
+        - |
+          cd source-code
+          scp -r . adminuser@20.231.55.121:/var/www/html/
+
+resources:
+- name: source-code
+  type: git
+  source:
+    uri: https://github.com/bamisere/corp.git
+    branch: master

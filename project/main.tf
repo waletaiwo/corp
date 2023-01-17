@@ -144,10 +144,6 @@ resource "azurerm_linux_virtual_machine" "mav-vm" {
   network_interface_ids = [
     azurerm_network_interface.mav-nic.id,
   ]
-  admin_ssh_key {
-    username   = "adminuser"
-    public_key = file("~/.ssh/mavazurekey.pub")
-  }
 
 
   os_disk {
